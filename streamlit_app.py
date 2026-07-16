@@ -50,37 +50,47 @@ if swf_b64:
     ruffle_html = f"""
     <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@latest/dist/ruffle.js"></script>
     <div style="margin: 20px 0;">
-        <canvas id="ruffle-canvas" style="width: 100%; max-width: 600px; height: 400px; background: #f0f0f0; display: block; margin: 0 auto;"></canvas>
+        <div id="ruffle-container" style="width: 100%; max-width: 600px; height: 400px; background: #f0f0f0; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+            <p>Loading game...</p>
+        </div>
     </div>
     <script>
-    (async () => {{
-        // Initialize Ruffle
-        await window.RufflePlayer.isSupported();
-        const ruffle = window.RufflePlayer.newest();
-        const player = ruffle.createPlayer();
-        const canvas = document.getElementById('ruffle-canvas');
-        canvas.parentNode.replaceChild(player, canvas);
-
-        // Load SWF from base64
-        const binaryString = atob('{swf_b64}');
-        const len = binaryString.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {{
-            bytes[i] = binaryString.charCodeAt(i);
+    function waitForRuffle() {{
+        if (typeof window.RufflePlayer !== 'undefined') {{
+            loadGame();
+        }} else {{
+            setTimeout(waitForRuffle, 100);
         }}
+    }}
 
-        // Load from data
-        await player.load({{
-            data: bytes.buffer,
-        }});
-    }})().catch(err => {{
-        console.error('Ruffle error:', err);
-        document.getElementById('ruffle-canvas').style.display = 'none';
-        const msg = document.createElement('div');
-        msg.style.cssText = 'color: red; padding: 20px; text-align: center;';
-        msg.textContent = 'Failed to load game: ' + err.message;
-        document.body.appendChild(msg);
-    }});
+    async function loadGame() {{
+        try {{
+            const ruffle = window.RufflePlayer.newest();
+            const player = ruffle.createPlayer();
+            const container = document.getElementById('ruffle-container');
+            container.innerHTML = '';
+            container.appendChild(player);
+
+            // Load SWF from base64
+            const binaryString = atob('{swf_b64}');
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {{
+                bytes[i] = binaryString.charCodeAt(i);
+            }}
+
+            await player.load({{
+                data: bytes.buffer,
+            }});
+        }} catch (err) {{
+            console.error('Ruffle error:', err);
+            const container = document.getElementById('ruffle-container');
+            container.innerHTML = '<p style="color: red; text-align: center;">Failed to load game: ' + err.message + '</p>';
+        }}
+    }}
+
+    // Wait for Ruffle to load
+    waitForRuffle();
     </script>
     """
 
