@@ -60,9 +60,10 @@ class PulsedFlowCascade:
         self.y_organic = np.zeros((self.n_stages, self.n_elements))   # organic conc (g/L)
 
         # Flowrates (ml/min) per section
-        self.Qx_ext = 5.0
-        self.Qx_scrub = 8.4  # 70% of 12
-        self.Qx_strip = 12.0
+        self.Q_feed = 25.0  # feed aqueous flowrate
+        self.Qx_ext = 25.0  # extraction aqueous flowrate
+        self.Qx_scrub = 8.4  # 70% of strip flowrate
+        self.Qx_strip = 12.0  # strip aqueous flowrate
         self.Qy = 32.5  # organic flowrate (all sections)
 
     def _get_volumes_section(self, section: str) -> Tuple[float, float]:
@@ -190,8 +191,9 @@ class PulsedFlowCascade:
         self.x_aqueous = x_init.copy()
         self.y_organic = y_init.copy()
 
-    def set_flowrates(self, Qx_ext: float, Qx_scrub: float, Qx_strip: float, Qy: float):
+    def set_flowrates(self, Q_feed: float, Qx_ext: float, Qx_scrub: float, Qx_strip: float, Qy: float):
         """Update flowrates"""
+        self.Q_feed = Q_feed
         self.Qx_ext = Qx_ext
         self.Qx_scrub = Qx_scrub
         self.Qx_strip = Qx_strip

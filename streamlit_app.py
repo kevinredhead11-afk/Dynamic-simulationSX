@@ -70,7 +70,8 @@ def simulate_with_perturbation(cascade, flowrates_schedule, total_time_min=120):
 
     # Current flowrates
     current_flows = {
-        'Qx_ext': 5.0,
+        'Q_feed': 25.0,
+        'Qx_ext': 25.0,
         'Qx_scrub': 8.4,
         'Qx_strip': 12.0,
         'Qy': 32.5
@@ -91,6 +92,7 @@ def simulate_with_perturbation(cascade, flowrates_schedule, total_time_min=120):
 
         # Update cascade flowrates
         cascade.set_flowrates(
+            current_flows['Q_feed'],
             current_flows['Qx_ext'],
             current_flows['Qx_scrub'],
             current_flows['Qx_strip'],
@@ -210,10 +212,10 @@ with col1:
     st.subheader("**Initial Flowrates**")
     st.markdown("(Baseline - Steady State)")
 
-    Qx_ext_1 = st.number_input(
-        "Ext Aqueous (ml/min)",
-        value=5.0, min_value=0.1, max_value=20.0, step=0.5,
-        key="Qx_ext_1"
+    Q_feed_1 = st.number_input(
+        "Feed Aqueous (ml/min)",
+        value=25.0, min_value=1.0, max_value=50.0, step=0.5,
+        key="Q_feed_1"
     )
 
     Qx_strip_1 = st.number_input(
@@ -229,15 +231,16 @@ with col1:
     )
 
     st.info(f"**Scrub Aqueous:** {0.7 * Qx_strip_1:.2f} (70% of Strip)")
+    st.info(f"**Extraction Aqueous:** {Q_feed_1:.2f} (Feed)")
 
 with col2:
     st.subheader("**Perturbed Flowrates**")
     st.markdown("(New values - after t=10 min)")
 
-    Qx_ext_2 = st.number_input(
-        "Ext Aqueous (ml/min)",
-        value=6.0, min_value=0.1, max_value=20.0, step=0.5,
-        key="Qx_ext_2"
+    Q_feed_2 = st.number_input(
+        "Feed Aqueous (ml/min)",
+        value=25.0, min_value=1.0, max_value=50.0, step=0.5,
+        key="Q_feed_2"
     )
 
     Qx_strip_2 = st.number_input(
@@ -253,6 +256,7 @@ with col2:
     )
 
     st.info(f"**Scrub Aqueous:** {0.7 * Qx_strip_2:.2f} (70% of Strip)")
+    st.info(f"**Extraction Aqueous:** {Q_feed_2:.2f} (Feed)")
 
 with col3:
     st.subheader("**Simulation Parameters**")
@@ -288,13 +292,15 @@ if st.session_state.run_simulation:
         # Define flowrate schedule
         flowrates_schedule = {
             0.0: {
-                'Qx_ext': Qx_ext_1,
+                'Q_feed': Q_feed_1,
+                'Qx_ext': Q_feed_1,
                 'Qx_scrub': 0.7 * Qx_strip_1,
                 'Qx_strip': Qx_strip_1,
                 'Qy': Qy_1
             },
             t_pert: {  # Perturbation point
-                'Qx_ext': Qx_ext_2,
+                'Q_feed': Q_feed_2,
+                'Qx_ext': Q_feed_2,
                 'Qx_scrub': 0.7 * Qx_strip_2,
                 'Qx_strip': Qx_strip_2,
                 'Qy': Qy_2
