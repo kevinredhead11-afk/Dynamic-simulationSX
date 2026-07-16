@@ -116,7 +116,7 @@ def plot_aqueous_distributions(x_profile, title_suffix=""):
 
     # Total concentration
     D = np.array([0.0031, 0.5959])
-    y_profile = x_profile * D[:, np.newaxis]
+    y_profile = x_profile * D[np.newaxis, :]
     total = x_profile + y_profile
 
     # Percentage
